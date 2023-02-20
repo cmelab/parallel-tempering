@@ -45,11 +45,10 @@ def get_parameters():
     # First, the mixing temperature, which we'll keep at 10 for all jobs
     # Second, the state point temperature
     parameters["kT"] = [
-            [10, 1.5]
+        [10, 1.5]
     ]
     parameters["max_trans"] = [[0.5, 0.5]]
     parameters["seed"] = [20]
-
 
     return list(parameters.keys()), list(product(*parameters.values()))
 
@@ -91,6 +90,10 @@ def main():
     project.write_statepoints()
 
 
-if __name__ == "__main__":
+def init_project():
     logging.basicConfig(level=logging.INFO)
     main()
+
+
+if __name__ == "__main__":
+    init_project()
