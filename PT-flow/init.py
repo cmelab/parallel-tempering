@@ -21,9 +21,11 @@ def get_parameters():
 
     # system parameters
     # Put your density state points here:
-    parameters["mode"] = ["MC"]
+    parameters["mode"] = ["MCMC-flow"]
     parameters["workspace"] = ["../MCMC-flow/"]
     parameters["n_attempts"] = [10]
+    parameters["PT_n_steps"] = [[1e6]]
+    parameters["PT_kT"] = [[1.5]]
     parameters["seed"] = [20]
 
     return list(parameters.keys()), list(product(*parameters.values()))
