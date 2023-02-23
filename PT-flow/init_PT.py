@@ -19,14 +19,20 @@ import signac
 def get_parameters():
     parameters = OrderedDict()
 
-    # system parameters
-    # Put your density state points here:
+    # simulation mode: MCMC-flow or polymer-flow
     parameters["mode"] = ["MCMC-flow"]
-    parameters["workspace"] = ["../MCMC-flow/"]
-    parameters["n_attempts"] = [10]
+    # number of run steps between swaps
     parameters["PT_n_steps"] = [[1e6]]
-    parameters["PT_kT"] = [[1.5]]
     parameters["seed"] = [20]
+
+    # total number of swaps
+    parameters["n_attempts"] = [10]
+    # initial wait time (in seconds) before checking the status of jobs
+    parameters["init_wait"] = [3600]
+    # additional wait time (in seconds) after the first wait time is over and jobs are still not done
+    parameters["additional_wait"] = [600]
+    # maximum wait time (in seconds)
+    parameters["max_wait"] = [10800]
 
     return list(parameters.keys()), list(product(*parameters.values()))
 
@@ -40,6 +46,7 @@ def main():
         parent_job = project.open_job(parent_statepoint)
         parent_job.init()
         parent_job.doc.setdefault("done", False)
+        parent_job.doc.setdefault("job_type", "PT")
         parent_job.doc.setdefault("current_attempt", 0)
         parent_job.doc.setdefault("swap_history", [])
         parent_job.doc.setdefault("accepted_attempts", [])

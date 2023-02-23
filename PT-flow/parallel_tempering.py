@@ -93,7 +93,7 @@ def sample(job):
         print("-----------------------")
         # import files from signac flow
         sys.path.append("../{}/".format(job.sp.mode))
-        from init import init_project
+        from init import init_jobs
         from project import MyProject
 
         # Before first swap attempt, first we need to initiate signac project and submit jobs.
@@ -106,7 +106,8 @@ def sample(job):
             print("----------------------")
 
             try:
-                init_project()
+                init_jobs()
+                logger.info("Successfully initiated {} project...".format(job.sp.mode))
                 print("----------------------")
                 print("Successfully initiated {} project...".format(job.sp.mode))
                 print("----------------------")
@@ -123,8 +124,6 @@ def sample(job):
             except Exception as error:
                 logger.error(f"Error at line: {error.args[0]}")
                 raise RuntimeError("project submission failed")
-            #TODO: If we can find a way to check the status of submitted jobs frequently here
-            # (maybe using a while loop), then we can move on to the next step easily.
 
         else:
             # find signac project
