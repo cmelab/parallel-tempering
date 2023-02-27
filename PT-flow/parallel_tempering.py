@@ -232,23 +232,17 @@ def sample(job):
 
                 snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
                 positions_i = copy.deepcopy(snapshot_i.particles.position)
-                print("i: ", positions_i)
+
                 snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
-                positions_j = copy.deepcopy(snapshot_i.particles.position)
-                print("j: ", positions_j)
+                positions_j = copy.deepcopy(snapshot_j.particles.position)
+
                 # swap positions and save snapshot
                 with gsd.hoomd.open(job_i.fn("restart.gsd"), "wb") as traj:
                     snapshot_i.particles.position = positions_j
                     traj.append(snapshot_i)
-                snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
-                print('swap i: ', snapshot_i.particles.position)
-                print('done snap i')
                 with gsd.hoomd.open(job_j.fn("restart.gsd"), "wb") as traj:
                     snapshot_j.particles.position = positions_i
                     traj.append(snapshot_j)
-                snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
-                print('swap j: ', snapshot_j.particles.position)
-                print('done snap j')
 
                 # submit simulations
                 submit_sims(MyProject())

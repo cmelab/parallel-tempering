@@ -21,7 +21,7 @@ def get_parameters():
 
     # system parameters
     parameters["n_density"] = [0.5]
-    parameters["n_particles"] = [100]
+    parameters["n_particles"] = [10]
     parameters["r"] = [0.5]
     parameters["r_cut"] = [2.5]
     parameters["energy_func"] = ["lj"]
@@ -35,15 +35,15 @@ def get_parameters():
     parameters["e_factor"] = [0.1, 0.2, 0.5, 1.]
 
     # logging parameters
-    parameters["energy_write_freq"] = [1000]
-    parameters["trajectory_write_freq"] = [10000]
+    parameters["energy_write_freq"] = [10]
+    parameters["trajectory_write_freq"] = [10]
 
     # run parameters
-    parameters["mixing_steps"] = [2000]
+    parameters["mixing_steps"] = [200]
     parameters["mixing_kT"] = [10]
     parameters["mixing_max_trans"] = [0.5]
 
-    parameters["n_steps"] = [[2000]]
+    parameters["n_steps"] = [[200]]
     parameters["kT"] = [[1.5]]
     parameters["max_trans"] = [[0.5]]
     parameters["seed"] = [20]
@@ -54,8 +54,8 @@ def get_parameters():
 custom_job_doc = {}  # add keys and values for each job document created
 
 
-def main():
-    project = signac.init_project("MCMC-project")  # Set the signac project name
+def main(root):
+    project = signac.init_project("MCMC-project", root=root)  # Set the signac project name
     param_names, param_combinations = get_parameters()
     # Create jobs
     for params in param_combinations:
@@ -79,9 +79,9 @@ def main():
 
     project.write_statepoints()
 
-def init_jobs():
+def init_jobs(root='../'):
     logging.basicConfig(level=logging.INFO)
-    main()
+    main(root)
 
 
 if __name__ == "__main__":
