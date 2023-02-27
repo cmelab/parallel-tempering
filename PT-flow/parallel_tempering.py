@@ -212,10 +212,13 @@ def sample(job):
                 print("----------------------")
                 project = signac.get_project()
                 sim_jobs = list(project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"))
+                print(sim_jobs)
                 # find a random job and a neighbor to swap their configurations
                 i = random.randint(1, len(sim_jobs) - 1)
+                print(i)
                 # find the neighbor with lower e_factor (equivalent to higher T)
                 j = i - 1
+                print(j)
                 e_factor_i = sim_jobs[i][0]
                 job_i = list(sim_jobs[i][1])[0]
 
