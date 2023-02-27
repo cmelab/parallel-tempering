@@ -193,9 +193,10 @@ def sample(job):
         project = signac.get_project()
         e_factors = []
         sim_jobs = []
-        for e, job in project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"):
+        for e, s_job in project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"):
             e_factors.append(e)
-            sim_jobs.append(list(job)[0])
+            sim_jobs.append(list(s_job)[0])
+        print('sim_jobs: ', sim_jobs)
         while job.doc["current_attempt"] <= job.sp.n_attempts:
             print('current swap: ', job.doc["current_attempt"])
             # First, making sure the simulations are finished
@@ -218,7 +219,7 @@ def sample(job):
                 e_factor_i = e_factors[i]
                 job_i = sim_jobs[i]
 
-                e_factor_j = e_factors[j][0]
+                e_factor_j = e_factors[j]
                 job_j = sim_jobs[j]
                 # TODO: get potential energy for both and calculate acceptance criteria.
                 print("----------------------")
@@ -226,23 +227,28 @@ def sample(job):
                 print("----------------------")
                 # Accepting the swap
                 job.doc["swap_history"].append({"i": i, "j": j, "e_factor_i": e_factor_i, "e_factor_j": e_factor_j,
-                                                "job_i": job_i, "job_j": job_j, "done": False})
+                                                "job_i": job_i.id, "job_j": job_j.id, "done": False})
                 job.doc["current_attempt"] += 1
 
-                snapshot_i = gsd.hoomd.open(job_i.fn("snapshot.gsd"))[0]
+                snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
                 positions_i = copy.deepcopy(snapshot_i.particles.position)
-
-                snapshot_j = job_j.fn("snapshot.gsd")[0]
+                print("i: ", positions_i)
+                snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
                 positions_j = copy.deepcopy(snapshot_i.particles.position)
-
+                print("j: ", positions_j)
                 # swap positions and save snapshot
-                with gsd.hoomd.open(job_i.fn("snapshot.gsd"), "w") as traj:
-                    snapshot_i.particle.position = positions_j
+                with gsd.hoomd.open(job_i.fn("restart.gsd"), "wb") as traj:
+                    snapshot_i.particles.position = positions_j
                     traj.append(snapshot_i)
-
-                with gsd.hoomd.open(job_j.fn("snapshot.gsd"), "w") as traj:
-                    snapshot_j.particle.position = positions_i
+                snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
+                print('swap i: ', snapshot_i.particles.position)
+                print('done snap i')
+                with gsd.hoomd.open(job_j.fn("restart.gsd"), "wb") as traj:
+                    snapshot_j.particles.position = positions_i
                     traj.append(snapshot_j)
+                snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
+                print('swap j: ', snapshot_j.particles.position)
+                print('done snap j')
 
                 # submit simulations
                 submit_sims(MyProject())
