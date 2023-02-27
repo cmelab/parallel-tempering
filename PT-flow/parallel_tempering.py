@@ -189,12 +189,14 @@ def sample(job):
                 print("----------------------")
             except Exception as error:
                 logger.error(f"Error at line: {error.args[0]}")
-                raise RuntimeError("project init failed")
+                raise RuntimeError("project init failed. {}".format(error.args[0]))
 
             submit_sims(job, MyProject())
 
         while job.doc["current_attempt"] <= job.sp.n_attempts:
+            print('current swap: ', job.doc["current_attempt"])
             # First, making sure the simulations are finished
+            print("checking status of simulations...")
             if check_status(init_wait, extra_wait, max_tries):
                 if job.doc["current_attempt"] > 0:
                     # find the last swap
