@@ -82,6 +82,14 @@ def initialized(job):
     return job.doc.get("current_attempt") > 0
 
 
+def sims_done():
+    project = signac.get_project()
+    jobs_list = project.find_jobs({'doc.job_type': "sim"})
+    return all([job.doc["done"] for job in jobs_list])
+
+
+
+
 @directives(executable="python -u")
 @MyProject.operation
 @MyProject.post(finished)
@@ -125,87 +133,83 @@ def sample(job):
                 logger.error(f"Error at line: {error.args[0]}")
                 raise RuntimeError("project submission failed")
 
-        else:
+        while job.doc["current_attempt"] <= job.sp.n_attempts:
             # find signac project
-            project = signac.get_project(job.sp.workspace)
-            jobs_list = project.find_jobs().groupby("e_factor")
+
 
             # First, making sure the previous swap (if exists) was finished successfully
-            if job.doc["current_attempt"] > 0:
-                # find the last swap
-                last_swap = job.doc["swap_history"][-1]
+            if is_finished(jobs_list)
+        if job.doc["current_attempt"] > 0:
+            # find the last swap
+            last_swap = job.doc["swap_history"][-1]
 
-                job_i = project.open_job(id=last_swap["job_i"])
-                job_j = project.open_job(id=last_swap["job_j"])
+            job_i = project.open_job(id=last_swap["job_i"])
+            job_j = project.open_job(id=last_swap["job_j"])
 
-                # TODO: probably need to check all the jobs, but for now we only check i & j status
-                try:
-                    assert job_i.doc["done"] and job_j.doc["done"]
-                    job.doc["swap_history"][-1]["done"] = True
-                except AssertionError:
-                    # previous swap was unsuccessful, need to repeat.
-                    job.doc["current_attempt"] -= 1
+            # TODO: probably need to check all the jobs, but for now we only check i & j status
+            try:
+                assert job_i.doc["done"] and job_j.doc["done"]
+                job.doc["swap_history"][-1]["done"] = True
+            except AssertionError:
+                # previous swap was unsuccessful, need to repeat.
+                job.doc["current_attempt"] -= 1
 
-            if job.doc["current_attempt"] <= job.sp.n_attempts:
+        if job.doc["current_attempt"] <= job.sp.n_attempts:
+            print("----------------------")
+            print("Initiating a swap...")
+            print("----------------------")
+            # find a random job and a neighbor to swap their configurations
+            i = random.randint(1, len(jobs_list) - 1)
+            # find the neighbor with lower e_factor (equivalent to higher T)
+            j = i - 1
+            e_factor_i = jobs_list[i][0]
+            job_i = list(jobs_list[i][1])[0]
+
+            e_factor_j = jobs_list[j][0]
+            job_j = list(jobs_list[j][1])[0]
+            # TODO: get potential energy for both and calculate acceptance criteria.
+
+            print("----------------------")
+            print("Swapping e_factor {} with {}...".format(e_factor_i, e_factor_j))
+            print("----------------------")
+            # Accepting the swap
+            job.doc["swap_history"].append({"i": i, "j": j, "e_factor_i": e_factor_i, "e_factor_j": e_factor_j,
+                                            "job_i": job_i, "job_j": job_j, "done": False})
+            job.doc["current_attempt"] += 1
+
+            snapshot_i = gsd.hoomd.open(job_i.fn("snapshot.gsd"))[0]
+            positions_i = copy.deepcopy(snapshot_i.particles.position)
+
+            snapshot_j = job_j.fn("snapshot.gsd")[0]
+            positions_j = copy.deepcopy(snapshot_i.particles.position)
+
+            # swap positions and save snapshot
+            with gsd.hoomd.open(job_i.fn("snapshot.gsd"), "w") as traj:
+                snapshot_i.particle.position = positions_j
+                traj.append(snapshot_i)
+
+            with gsd.hoomd.open(job_j.fn("snapshot.gsd"), "w") as traj:
+                snapshot_j.particle.position = positions_i
+                traj.append(snapshot_j)
+
+            # change state of all jobs
+            for e_factor, sample_job in jobs_list:
+                sample_job = list(sample_job)[0]
+                sample_job.sp.n_steps = job.sp.PT_n_steps
+                sample_job.sp.kT = job.sp.PT_kT
+                sample_job.doc["done"] = False
+            # resume signac jobs
+            try:
+                MyProject().submit()
                 print("----------------------")
-                print("Initiating a swap...")
+                print("Successfully resumed {} project...".format(job.sp.mode))
                 print("----------------------")
-                # find a random job and a neighbor to swap their configurations
-                i = random.randint(1, len(jobs_list) - 1)
-                # find the neighbor with lower e_factor (equivalent to higher T)
-                j = i - 1
-                e_factor_i = jobs_list[i][0]
-                job_i = list(jobs_list[i][1])[0]
-
-                e_factor_j = jobs_list[j][0]
-                job_j = list(jobs_list[j][1])[0]
-                # TODO: get potential energy for both and calculate acceptance criteria.
-
-                print("----------------------")
-                print("Swapping e_factor {} with {}...".format(e_factor_i, e_factor_j))
-                print("----------------------")
-                # Accepting the swap
-                job.doc["swap_history"].append({"i": i, "j": j, "e_factor_i": e_factor_i, "e_factor_j": e_factor_j,
-                                                "job_i": job_i, "job_j": job_j, "done": False})
-                job.doc["current_attempt"] += 1
-
-                snapshot_i = gsd.hoomd.open(job_i.fn("snapshot.gsd"))[0]
-                positions_i = copy.deepcopy(snapshot_i.particles.position)
-
-                snapshot_j = job_j.fn("snapshot.gsd")[0]
-                positions_j = copy.deepcopy(snapshot_i.particles.position)
-
-                # swap positions and save snapshot
-                with gsd.hoomd.open(job_i.fn("snapshot.gsd"), "w") as traj:
-                    snapshot_i.particle.position = positions_j
-                    traj.append(snapshot_i)
-
-                with gsd.hoomd.open(job_j.fn("snapshot.gsd"), "w") as traj:
-                    snapshot_j.particle.position = positions_i
-                    traj.append(snapshot_j)
-
-                # change state of all jobs
-                for e_factor, sample_job in jobs_list:
-                    sample_job = list(sample_job)[0]
-                    sample_job.sp.n_steps = job.sp.PT_n_steps
-                    sample_job.sp.kT = job.sp.PT_kT
-                    sample_job.doc["done"] = False
-                # resume signac jobs
-                try:
-                    MyProject().submit()
-                    print("----------------------")
-                    print("Successfully resumed {} project...".format(job.sp.mode))
-                    print("----------------------")
-                    logger.info("Successfully resumed {} project...".format(job.sp.mode))
-                except Exception as error:
-                    logger.error(f"Error at line: {error.args[0]}")
-                    raise RuntimeError("project resume failed")
-
-
-
-
-            else:
-                job.doc["done"] = True
+                logger.info("Successfully resumed {} project...".format(job.sp.mode))
+            except Exception as error:
+                logger.error(f"Error at line: {error.args[0]}")
+                raise RuntimeError("project resume failed")
+        else:
+            job.doc["done"] = True
 
 
 if __name__ == "__main__":
