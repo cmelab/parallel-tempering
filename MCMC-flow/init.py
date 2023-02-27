@@ -32,6 +32,7 @@ def get_parameters():
     parameters["sigma"] = [0.5]
     parameters["n"] = [12]
     parameters["m"] = [6]
+    parameters["e_factor"] = [0.1, 0.2, 0.5, 1.]
 
     # logging parameters
     parameters["energy_write_freq"] = [1000]

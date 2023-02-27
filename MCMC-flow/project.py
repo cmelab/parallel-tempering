@@ -3,8 +3,8 @@ Execute this script directly from the command line, to view your project's
 status, execute operations and submit them to a cluster. See also:
     $ python src/project.py --help
 """
-import sys
 import os
+import sys
 
 # getting the name of the directory
 # where the this file is present.
@@ -81,9 +81,11 @@ def sampled(job):
 def initialized(job):
     return job.isfile("trajectory.gsd")
 
+
 @MyProject.label
 def is_sim(job):
     return job.doc["job_type"] == "sim"
+
 
 @directives(executable="python -u")
 @MyProject.operation
@@ -104,7 +106,8 @@ def sample(job):
         sim = Simulation(n_particles=job.sp.n_particles, n_density=job.sp.n_density, r=job.sp.r, r_cut=job.sp.r_cut,
                          energy_write_freq=job.sp.energy_write_freq, trajectory_write_freq=job.sp.trajectory_write_freq,
                          energy_func=ENERGY_FUNCS[job.sp.energy_func], hard_sphere=job.sp.hard_sphere, restart=restart,
-                         sigma=job.sp.sigma, epsilon=job.sp.epsilon, n=job.sp.n, m=job.sp.m, seed=job.sp.seed)
+                         sigma=job.sp.sigma, epsilon=job.sp.epsilon, n=job.sp.n, m=job.sp.m, e_factor=job.sp.e_factor,
+                         seed=job.sp.seed)
         job.doc["L"] = sim.L
 
         print("----------------------")
