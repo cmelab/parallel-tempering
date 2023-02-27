@@ -25,9 +25,6 @@ import signac
 import random
 import copy
 import gsd.hoomd
-import logging
-
-logger = logging.getLogger()
 
 
 class PT_Project(FlowProject):
@@ -92,6 +89,7 @@ def wait(init_wait, extra_wait, max_tries):
     :param max_tries: Maximum number of status checks.
     :return:
     """
+
     def decorator(function):
         def wrapper(*args, **kwargs):
             retries = 0
@@ -141,18 +139,16 @@ def update_swap_info(swap):
     job_j.doc["swap"] = False
 
 
-def submit_sims(job, project):
+def submit_sims(project):
     for job in get_sim_jobs():
         job.doc["done"] = False
     try:
         project.submit()
         print("----------------------")
-        print("Successfully submitted {} project...".format(job.sp))
+        print("Successfully submitted simulations...")
         print("----------------------")
-        logger.info("Successfully submitted {} project...".format(job.sp))
     except Exception as error:
-        logger.error(f"Error at line: {error.args[0]}")
-        raise RuntimeError("project submission failed")
+        raise RuntimeError(f"project submission failed. Error at line: {error.args[0]}")
 
 
 @directives(executable="python -u")
@@ -185,16 +181,21 @@ def sample(job):
 
             try:
                 init_jobs()
-                logger.info("Successfully initiated {} project...".format(job.sp.mode))
                 print("----------------------")
                 print("Successfully initiated {} project...".format(job.sp.mode))
                 print("----------------------")
             except Exception as error:
-                logger.error(f"Error at line: {error.args[0]}")
                 raise RuntimeError("project init failed. {}".format(error.args[0]))
 
-            submit_sims(job, MyProject())
+            submit_sims(MyProject())
 
+        # load simulation jobs and e_factors
+        project = signac.get_project()
+        e_factors = []
+        sim_jobs = []
+        for e, job in project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"):
+            e_factors.append(e)
+            sim_jobs.append(list(job)[0])
         while job.doc["current_attempt"] <= job.sp.n_attempts:
             print('current swap: ', job.doc["current_attempt"])
             # First, making sure the simulations are finished
@@ -210,20 +211,15 @@ def sample(job):
                 print("----------------------")
                 print("Initiating a swap...")
                 print("----------------------")
-                project = signac.get_project()
-                sim_jobs = list(project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"))
-                print(sim_jobs)
                 # find a random job and a neighbor to swap their configurations
                 i = random.randint(1, len(sim_jobs) - 1)
-                print(i)
                 # find the neighbor with lower e_factor (equivalent to higher T)
                 j = i - 1
-                print(j)
-                e_factor_i = sim_jobs[i][0]
-                job_i = list(sim_jobs[i][1])[0]
+                e_factor_i = e_factors[i]
+                job_i = sim_jobs[i]
 
-                e_factor_j = sim_jobs[j][0]
-                job_j = list(sim_jobs[j][1])[0]
+                e_factor_j = e_factors[j][0]
+                job_j = sim_jobs[j]
                 # TODO: get potential energy for both and calculate acceptance criteria.
                 print("----------------------")
                 print("Swapping e_factor {} with {}...".format(e_factor_i, e_factor_j))
@@ -249,7 +245,7 @@ def sample(job):
                     traj.append(snapshot_j)
 
                 # submit simulations
-                submit_sims(job, MyProject())
+                submit_sims(MyProject())
 
         job.doc["done"] = True
 
