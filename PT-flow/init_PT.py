@@ -30,9 +30,9 @@ def get_parameters():
     # initial wait time (in seconds) before checking the status of jobs
     parameters["init_wait"] = [3600]
     # additional wait time (in seconds) after the first wait time is over and jobs are still not done
-    parameters["additional_wait"] = [600]
+    parameters["extra_wait"] = [600]
     # maximum wait time (in seconds)
-    parameters["max_wait"] = [10800]
+    parameters["max_tries"] = [5]
 
     return list(parameters.keys()), list(product(*parameters.values()))
 
