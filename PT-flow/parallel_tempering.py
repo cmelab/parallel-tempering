@@ -62,7 +62,7 @@ class R2(DefaultSlurmEnvironment):
 
 class Fry(DefaultSlurmEnvironment):
     hostname_pattern = "fry"
-    template = "../templates/fry.sh"
+    template = "fry.sh"
 
     @classmethod
     def add_args(cls, parser):
@@ -147,9 +147,9 @@ def submit_sims(job, project):
     try:
         project.submit()
         print("----------------------")
-        print("Successfully submitted {} project...".format(job.sp.mode))
+        print("Successfully submitted {} project...".format(job.sp))
         print("----------------------")
-        logger.info("Successfully submitted {} project...".format(job.sp.mode))
+        logger.info("Successfully submitted {} project...".format(job.sp))
     except Exception as error:
         logger.error(f"Error at line: {error.args[0]}")
         raise RuntimeError("project submission failed")
@@ -165,7 +165,9 @@ def sample(job):
         print(job.id)
         print("-----------------------")
         # import files from signac flow
-        sys.path.append("../{}/".format(job.sp.mode))
+        project = signac.get_project()
+        path = os.path.join(project.root_directory(), "../{}/".format(job.sp.mode))
+        sys.path.append(path)
         from init import init_jobs
         from project import MyProject
 
@@ -209,7 +211,7 @@ def sample(job):
                 print("Initiating a swap...")
                 print("----------------------")
                 project = signac.get_project()
-                sim_jobs = project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor")
+                sim_jobs = list(project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"))
                 # find a random job and a neighbor to swap their configurations
                 i = random.randint(1, len(sim_jobs) - 1)
                 # find the neighbor with lower e_factor (equivalent to higher T)
