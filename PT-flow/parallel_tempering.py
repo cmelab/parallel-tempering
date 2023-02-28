@@ -33,7 +33,7 @@ class PT_Project(FlowProject):
 
 class Borah(DefaultSlurmEnvironment):
     hostname_pattern = "borah"
-    template = "../templates/borah.sh"
+    template = "borah.sh"
 
     @classmethod
     def add_args(cls, parser):
@@ -46,7 +46,7 @@ class Borah(DefaultSlurmEnvironment):
 
 class R2(DefaultSlurmEnvironment):
     hostname_pattern = "r2"
-    template = "../templates/r2.sh"
+    template = "r2.sh"
 
     @classmethod
     def add_args(cls, parser):

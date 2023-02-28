@@ -24,7 +24,7 @@ def get_parameters():
     parameters["seed"] = [20]
 
     # total number of swaps`
-    parameters["n_attempts"] = [20]
+    parameters["n_attempts"] = [200]
     # initial wait time (including mixing run)
     parameters["first_wait"] = [900]
     # initial wait time (in seconds) before checking the status of jobs
