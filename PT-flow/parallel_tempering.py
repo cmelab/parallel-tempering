@@ -167,6 +167,7 @@ def sample(job):
         from init import init_jobs
         from project import MyProject
 
+        first_wait = job.sp.first_wait
         init_wait = job.sp.init_wait
         extra_wait = job.sp.extra_wait
         max_tries = job.sp.max_tries
@@ -201,7 +202,12 @@ def sample(job):
             print('current swap: ', job.doc["current_attempt"])
             # First, making sure the simulations are finished
             print("checking status of simulations...")
-            if check_status(init_wait, extra_wait, max_tries):
+            if job.doc["current_attempt"] == 0:
+                # set wait time to be longer for the very first run that includes the mixing phase
+                wait_time = first_wait
+            else:
+                wait_time = init_wait
+            if check_status(wait_time, extra_wait, max_tries):
                 if job.doc["current_attempt"] > 0:
                     # find the last swap
                     last_swap = job.doc["swap_history"][-1]

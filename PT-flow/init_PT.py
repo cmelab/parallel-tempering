@@ -21,16 +21,16 @@ def get_parameters():
 
     # simulation mode: MCMC-flow or polymer-flow
     parameters["mode"] = ["MCMC-flow"]
-    # number of run steps between swaps
-    parameters["PT_n_steps"] = [[1e6]]
     parameters["seed"] = [20]
 
     # total number of swaps
     parameters["n_attempts"] = [10]
+    # initial wait time (including mixing run)
+    parameters["first_wait"] = [800]
     # initial wait time (in seconds) before checking the status of jobs
-    parameters["init_wait"] = [3600]
+    parameters["init_wait"] = [400]
     # additional wait time (in seconds) after the first wait time is over and jobs are still not done
-    parameters["extra_wait"] = [600]
+    parameters["extra_wait"] = [100]
     # maximum wait time (in seconds)
     parameters["max_tries"] = [5]
 
