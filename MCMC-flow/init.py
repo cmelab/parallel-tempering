@@ -73,6 +73,7 @@ def main(root):
         parent_job.doc.setdefault("acceptance_ratio", [])
         parent_job.doc.setdefault("tps", [])
         parent_job.doc.setdefault("energy", [])
+        parent_job.doc.setdefault("avg_PE", [])
     if custom_job_doc:
         for key in custom_job_doc:
             parent_job.doc.setdefault(key, custom_job_doc[key])

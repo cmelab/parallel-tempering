@@ -5,7 +5,7 @@ status, execute operations and submit them to a cluster. See also:
 """
 import os
 import sys
-
+import numpy as np
 # getting the name of the directory
 # where the this file is present.
 current = os.path.dirname(os.path.realpath(__file__))
@@ -22,6 +22,7 @@ from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from simulation import Simulation
 from utils import inverse_distance_attractive, inverse_distance_repulsive, lj_energy
+
 
 ENERGY_FUNCS = {"lj": lj_energy,
                 "i_dist_att": inverse_distance_attractive,
@@ -146,7 +147,7 @@ def sample(job):
             job.doc["acceptance_ratio"].append(sim.acceptance_ratio)
             job.doc["tps"].append(sim.tps)
             job.doc["energy"].append(sim.energy)
-            job.doc["phase_{}".format(job.doc["current_run"])] = True
+            job.doc["avg_PE"].append(np.average(sim.energies))
             sim.reset_system()
             job.doc["current_run"] += 1
 
