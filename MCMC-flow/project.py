@@ -20,8 +20,8 @@ sys.path.append(parent)
 
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
-from simulation import Simulation
-from utils import inverse_distance_attractive, inverse_distance_repulsive, lj_energy
+from MCMC import Simulation
+from MCMC.utils import inverse_distance_attractive, inverse_distance_repulsive, lj_energy
 
 
 ENERGY_FUNCS = {"lj": lj_energy,
