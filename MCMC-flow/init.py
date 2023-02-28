@@ -20,12 +20,12 @@ def get_parameters():
     parameters = OrderedDict()
 
     # system parameters
-    parameters["n_density"] = [0.5]
+    parameters["n_density"] = [0.8]
     parameters["n_particles"] = [100]
     parameters["r"] = [0.5]
     parameters["r_cut"] = [2.5]
     parameters["energy_func"] = ["lj"]
-    parameters["hard_sphere"] = [True]
+    parameters["hard_sphere"] = [False]
 
     # LJ energy parameters
     parameters["epsilon"] = [1.0]
@@ -35,15 +35,15 @@ def get_parameters():
     parameters["e_factor"] = [0.01, 0.1, 0.2, 0.5, 0.7,  1.]
 
     # logging parameters
-    parameters["energy_write_freq"] = [10]
-    parameters["trajectory_write_freq"] = [10]
+    parameters["energy_write_freq"] = [500]
+    parameters["trajectory_write_freq"] = [5000]
 
     # run parameters
-    parameters["mixing_steps"] = [10e5]
+    parameters["mixing_steps"] = [1e6]
     parameters["mixing_kT"] = [10]
     parameters["mixing_max_trans"] = [0.5]
 
-    parameters["n_steps"] = [[10e5]]
+    parameters["n_steps"] = [[5e5]]
     parameters["kT"] = [[1.5]]
     parameters["max_trans"] = [[0.5]]
     parameters["seed"] = [20]
