@@ -21,7 +21,7 @@ def get_parameters():
 
     # system parameters
     parameters["n_density"] = [0.5]
-    parameters["n_particles"] = [10]
+    parameters["n_particles"] = [100]
     parameters["r"] = [0.5]
     parameters["r_cut"] = [2.5]
     parameters["energy_func"] = ["lj"]
@@ -32,18 +32,18 @@ def get_parameters():
     parameters["sigma"] = [0.5]
     parameters["n"] = [12]
     parameters["m"] = [6]
-    parameters["e_factor"] = [0.1, 0.2, 0.5, 1.]
+    parameters["e_factor"] = [0.01, 0.1, 0.2, 0.5, 0.7,  1.]
 
     # logging parameters
     parameters["energy_write_freq"] = [10]
     parameters["trajectory_write_freq"] = [10]
 
     # run parameters
-    parameters["mixing_steps"] = [200]
+    parameters["mixing_steps"] = [10e5]
     parameters["mixing_kT"] = [10]
     parameters["mixing_max_trans"] = [0.5]
 
-    parameters["n_steps"] = [[200]]
+    parameters["n_steps"] = [[10e5]]
     parameters["kT"] = [[1.5]]
     parameters["max_trans"] = [[0.5]]
     parameters["seed"] = [20]
