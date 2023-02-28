@@ -23,10 +23,10 @@ def get_parameters():
     parameters["mode"] = ["MCMC-flow"]
     parameters["seed"] = [20]
 
-    # total number of swaps
+    # total number of swaps`
     parameters["n_attempts"] = [20]
     # initial wait time (including mixing run)
-    parameters["first_wait"] = [800]
+    parameters["first_wait"] = [900]
     # initial wait time (in seconds) before checking the status of jobs
     parameters["init_wait"] = [400]
     # additional wait time (in seconds) after the first wait time is over and jobs are still not done
