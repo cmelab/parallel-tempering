@@ -34,7 +34,7 @@ class MyProject(FlowProject):
 
 
 class Borah(DefaultSlurmEnvironment):
-    hostname_pattern = "borah"
+    hostname_pattern = r"borah|.*\.cm\.cluster"
     template = "borah.sh"
 
     @classmethod
