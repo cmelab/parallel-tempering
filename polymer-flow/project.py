@@ -4,6 +4,7 @@ status, execute operations and submit them to a cluster. See also:
     $ python src/project.py --help
 """
 import os
+import shutil
 import sys
 import numpy as np
 # getting the name of the directory
@@ -83,6 +84,24 @@ def is_sim(job):
     return job.doc["job_type"] == "sim"
 
 
+# Useful functions
+def copy_trajectory(job, fname):
+    shutil.copyfile(job.fn("trajectory.gsd"), job.fn("fname")) 
+
+
+def load_pickle_objects(job, system_file, ff_file):
+    """
+    Load hoomd snapshot and list of hoomd forces
+    from pickle files in a job's workspace.
+    """
+    with open(job.fn(system_file), "rb") as f:
+        snap = pickle.load(f)
+    with open(job.fn(ff_file), "rb") as f:
+        hoomd_ff = pickle.load(f)
+
+    return snap, hoomd_ff
+
+
 @directives(executable="python -u")
 @MyProject.operation
 @MyProject.post(sampled)
@@ -98,7 +117,10 @@ def sample(job):
         print("----------------------")
 
         # Setting up the system
-        restart = job.isfile("restart.gsd")
+        # TODO: Fix restart logic, polymers repo can start a sim 
+        # directly from a snapshot/gsd and a list of hoomd ff objects
+        # Right now, working with pickle files to save snapshot and list of ff
+        #restart = job.isfile("restart.gsd")
         molecule_obj = getattr(hoomd_polymers.molecules, job.sp.molecule)
         ff_obj = getattr(hoomd_polymers.forcefields, job.sp.forcefield)
         system_obj = getattr(hoomd_polymers.systems, job.sp.system)
