@@ -63,7 +63,7 @@ def main(root):
         parent_job.doc.setdefault("swap", False)
         parent_job.doc.setdefault("done", False)
         parent_job.doc.setdefault("current_run", 0)
-        parent_job.doc.setdefault("mixed", False)
+        parent_job.doc.setdefault("ran_shrink", False)
         parent_job.doc.setdefault("timestep", [])
         parent_job.doc.setdefault("tps", [])
         parent_job.doc.setdefault("energy", [])
