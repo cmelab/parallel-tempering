@@ -33,7 +33,7 @@ def get_parameters():
     # Sim parameters
     parameters["r_cut"] = [2.5]
     parameters["dt"] = [0.0003]
-    parameters["scale_epsilon"] = [1.0]
+    parameters["e_factor"] = [1.0]
 
     # run parameters
     parameters["shrink_steps"] = [5e6]

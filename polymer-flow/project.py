@@ -20,6 +20,7 @@ sys.path.append(parent)
 
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
+import hoomd_polymers
 from hoomd_polymers.sim import Simulation
 
 
@@ -132,6 +133,9 @@ def sample(job):
                 log_write_freq=job.doc.log_write_frequency,
         )
         sim.pickle_forcefield()
+        if job.sp.e_factor != 1:
+            print("Scaling LJ epsilon values...")
+            sim.adjust_epsilon(scale_by=job.sp.e_factor)
         print("----------------------")
         print("Starting simulation...")
         print("----------------------")
