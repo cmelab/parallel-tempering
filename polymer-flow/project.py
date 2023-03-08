@@ -188,8 +188,7 @@ def sample(job):
         sim.run_NVT(
                 n_steps=job.sp.n_steps, kT=job.sp.kT, tau_kt=job.sp.tau_kt
         )
-        #TODO: Save restart.gsd instead of a pickle
-        sim.pickle_state(file_path="restart.pickle")
+        sim.save_restart_gsd()
         print("----------------------")
         print("Simulation finished...")
         print("----------------------")
