@@ -26,7 +26,7 @@ def get_parameters():
     ]
     # Pick the relevant parameter to sort jobs by when swapping
     # This parameter must be defined in the simulation project's state points
-    parameters["group_by"] - [
+    parameters["group_by"] = [
             #"e_factor",
             "kT",
     ]
@@ -59,7 +59,7 @@ def main():
         parent_job.doc.setdefault("current_attempt", 0)
         parent_job.doc.setdefault("swap_history", [])
         parent_job.doc.setdefault("accepted_attempts", [])
-        parent_job.doc.swap_parameter = job.sp.group_by
+        parent_job.doc.swap_parameter = parent_job.sp.group_by
 
     project.write_statepoints()
 

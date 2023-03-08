@@ -192,7 +192,7 @@ def sample(job):
 
         # load simulation jobs and e_factors
         project = signac.get_project()
-        swap_parameters = []  
+        swap_parameters = []
         sim_jobs = []
         for v, s_job in project.find_jobs({"doc.job_type": "sim"}).groupby(job.sp.group_by):
             swap_parameters.append(v)
@@ -229,7 +229,7 @@ def sample(job):
                 job_j = sim_jobs[j]
                 # TODO: get potential energy for both and calculate acceptance criteria.
                 print("----------------------")
-                print(f"Swapping {job.doc.swap_parameter} {param_i} with {param_j}..."
+                print(f"Swapping {job.doc.swap_parameter} {param_i} with {param_j}...")
                 print("----------------------")
                 # Accepting the swap
                 job.doc["swap_history"].append({"i": i, "j": j, "param_i": param_i, "param_j": param_j,
@@ -242,7 +242,7 @@ def sample(job):
                 snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
                 positions_j = copy.deepcopy(snapshot_j.particles.position)
 
-                # swap positions and save snapshot TODO: do we need to swap anything else for MD? 
+                # swap positions and save snapshot TODO: do we need to swap anything else for MD?
                 with gsd.hoomd.open(job_i.fn("restart.gsd"), "wb") as traj:
                     snapshot_i.particles.position = positions_j
                     traj.append(snapshot_i)

@@ -86,7 +86,7 @@ def is_sim(job):
 
 # Useful functions
 def copy_trajectory(job, fname):
-    shutil.copyfile(job.fn("trajectory.gsd"), job.fn("fname")) 
+    shutil.copyfile(job.fn("trajectory.gsd"), job.fn("fname"))
 
 
 def load_pickle_objects(job, system_file, ff_file):
@@ -117,7 +117,7 @@ def sample(job):
         print("----------------------")
 
         # Setting up the system
-        # TODO: Fix restart logic, polymers repo can start a sim 
+        # TODO: Fix restart logic, polymers repo can start a sim
         # directly from a snapshot/gsd and a list of hoomd ff objects
         # Right now, working with pickle files to save snapshot and list of ff
         #restart = job.isfile("restart.gsd")
@@ -144,10 +144,10 @@ def sample(job):
         # Set up stuff to initialize a Simulation
         job.doc.gsd_write_frequency = int(
                 job.sp.num_gsd_frames / job.doc.total_steps
-        ) 
+        )
         job.doc.log_write_frequency = int(
                 job.sp.num_data_logs / job.doc.total_steps
-        ) 
+        )
         sim = Simulation(
                 initial_state=system.hoomd_snapshot,
                 forcefield=system.hoomd_forcefield,
