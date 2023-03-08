@@ -23,6 +23,7 @@ from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 import hoomd_polymers
 import hoomd_polymers.molecules
+import hoomd_polymers.systems
 import hoomd_polymers.forcefields
 from hoomd_polymers.sim import Simulation
 
@@ -131,7 +132,7 @@ def sample(job):
                 n_mols=job.sp.n_chains,
                 chain_lengths=job.sp.chain_lengths,
                 density=job.sp.density,
-                mol_kwargs=job.sp.mol_kwargs
+                mol_kwargs=job.sp.molecule_kwargs
         )
         print("----------------------")
         print("System generated...")
