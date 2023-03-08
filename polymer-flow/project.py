@@ -170,7 +170,7 @@ def sample(job):
         # TODO: Check jobdoc shrink, don't run if True
         # Run shrink simulation
         sim.run_update_volume(
-                final_box=job.doc.traget_box_reduced,
+                final_box=job.doc.target_box_reduced,
                 n_steps=job.sp.shrink_steps,
                 period=int(job.sp.shrink_period),
                 kT=job.sp.shrink_kT,
