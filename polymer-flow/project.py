@@ -146,10 +146,10 @@ def sample(job):
         )
         # Set up stuff to initialize a Simulation
         job.doc.gsd_write_frequency = int(
-                job.sp.num_gsd_frames / job.doc.total_steps
+                job.doc.total_steps / job.sp.num_gsd_frames
         )
         job.doc.log_write_frequency = int(
-                job.sp.num_data_logs / job.doc.total_steps
+                job.doc.total_steps / job.sp.num_data_logs
         )
         sim = Simulation(
                 initial_state=system.hoomd_snapshot,
