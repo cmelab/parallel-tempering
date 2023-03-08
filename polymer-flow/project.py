@@ -22,6 +22,8 @@ sys.path.append(parent)
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 import hoomd_polymers
+import hoomd_polymers.molecules
+import hoomd_polymers.forcefields
 from hoomd_polymers.sim import Simulation
 
 
@@ -164,6 +166,7 @@ def sample(job):
         job.doc.target_box_reduced = (
                 system.target_box*10/system.reference_values.distance
         )
+        # TODO: Check jobdoc shrink, don't run if True
         # Run shrink simulation
         sim.run_update_volume(
                 final_box=job.doc.traget_box_reduced,
