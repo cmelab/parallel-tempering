@@ -40,7 +40,9 @@ def get_parameters():
     parameters["shrink_kT"] = [4.0]
     parameters["shrink_period"] = [100]
     parameters["n_steps"] = [5e6]
-    parameters["kT"] = [[2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2]]
+    parameters["kT"] = [
+            2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2
+    ]
     parameters["tau_kt"] = [0.03]
 
     # logging parameters
@@ -68,7 +70,9 @@ def main(root):
         parent_job.doc.setdefault("tps", [])
         parent_job.doc.setdefault("energy", [])
         parent_job.doc.setdefault("avg_PE", [])
-        parent_job.doc.total_steps = job.sp.n_steps + job.sp.shrink_steps 
+        parent_job.doc.total_steps = int(
+                parent_job.sp.n_steps + parent_job.sp.shrink_steps
+        )
 
     project.write_statepoints()
 
