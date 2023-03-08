@@ -167,29 +167,33 @@ def sample(job):
         job.doc.target_box_reduced = (
                 system.target_box*10/system.reference_values.distance
         )
-        # TODO: Check jobdoc shrink, don't run if True
+
         # Run shrink simulation
-        sim.run_update_volume(
-                final_box=job.doc.target_box_reduced,
-                n_steps=job.sp.shrink_steps,
-                period=int(job.sp.shrink_period),
-                kT=job.sp.shrink_kT,
-                tau_kt=job.sp.tau_kt
-        )
-        assert sim.box_lengths_reduced == job.doc.target_box_reduced
-        job.doc.ran_shrink = True
-        sim.pickle_state(file_path="shrink_finished.pickle")
-        print("----------------------")
-        print("Shrink simulation finished...")
-        print("----------------------")
+        if not job.doc.ran_shrink:
+            sim.run_update_volume(
+                    final_box_lengths=job.doc.target_box_reduced,
+                    n_steps=job.sp.shrink_steps,
+                    period=int(job.sp.shrink_period),
+                    kT=job.sp.shrink_kT,
+                    tau_kt=job.sp.tau_kt
+            )
+            assert sim.box_lengths_reduced == job.doc.target_box_reduced
+            job.doc.ran_shrink = True
+            sim.pickle_state(file_path="shrink_finished.pickle")
+            print("----------------------")
+            print("Shrink simulation finished...")
+            print("----------------------")
+
         # Run NVT simulation
         sim.run_NVT(
                 n_steps=job.sp.n_steps, kT=job.sp.kT, tau_kt=job.sp.tau_kt
         )
+        #TODO: Save restart.gsd instead of a pickle
         sim.pickle_state(file_path="restart.pickle")
         print("----------------------")
         print("Simulation finished...")
         print("----------------------")
+
         if job.doc["swap"]:
             copy_trajectory(job, fname=f"trajectory_{job.doc.current_run}_swap.gsd")
         else:
