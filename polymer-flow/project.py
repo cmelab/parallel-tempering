@@ -157,7 +157,7 @@ def sample(job):
         # Set up stuff to initialize a Simulation
         sim = Simulation(
                 initial_state=init_snap,
-                forcefield=system.hoomd_ff,
+                forcefield=hoomd_ff,
                 gsd_write_freq=job.doc.gsd_write_frequency,
                 log_write_freq=job.doc.log_write_frequency,
         )
@@ -182,7 +182,9 @@ def sample(job):
                     kT=job.sp.shrink_kT,
                     tau_kt=job.sp.tau_kt
             )
-            assert sim.box_lengths_reduced == job.doc.target_box_reduced
+            assert np.array_equal(
+                    sim.box_lengths_reduced, job.doc.target_box_reduced
+            )
             job.doc.ran_shrink = True
             sim.pickle_state(file_path="shrink_finished.pickle")
             print("----------------------")
