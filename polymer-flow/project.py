@@ -59,7 +59,7 @@ class R2(DefaultSlurmEnvironment):
 
 
 class Fry(DefaultSlurmEnvironment):
-    hostname_pattern = "fry"
+    hostname_pattern = r"fry|node*"
     template = "fry.sh"
 
     @classmethod
@@ -106,6 +106,7 @@ def load_pickle_objects(job, system_file, ff_file):
 
 
 @directives(executable="python -u")
+@directives(ngpu=1)
 @MyProject.operation
 @MyProject.post(sampled)
 @MyProject.pre(is_sim)
@@ -158,6 +159,9 @@ def sample(job):
                 gsd_write_freq=job.doc.gsd_write_frequency,
                 log_write_freq=job.doc.log_write_frequency,
         )
+        print("SIM DEVICE:")
+        print(sim.device)
+        print("----------------------")
         sim.pickle_forcefield()
         if job.sp.e_factor != 1:
             print("Scaling LJ epsilon values...")

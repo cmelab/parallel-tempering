@@ -152,6 +152,7 @@ def submit_sims(project):
 
 
 @directives(executable="python -u")
+@directives(ngpu=0)
 @PT_Project.operation
 @PT_Project.post(finished)
 def sample(job):
