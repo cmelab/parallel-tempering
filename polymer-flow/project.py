@@ -132,7 +132,8 @@ def sample(job):
                 n_mols=job.sp.n_chains,
                 chain_lengths=job.sp.chain_lengths,
                 density=job.sp.density,
-                mol_kwargs=job.sp.molecule_kwargs
+                mol_kwargs=job.sp.molecule_kwargs,
+                packing_expand_factor=3,
         )
         print("----------------------")
         print("System generated...")

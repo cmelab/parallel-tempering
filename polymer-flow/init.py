@@ -22,8 +22,8 @@ def get_parameters():
     # system parameters
     parameters["molecule"] = ["PPS"]
     parameters["system"] = ["Pack"]
-    parameters["density"] = [1.3]
-    parameters["n_chains"] = [[10]]
+    parameters["density"] = [1.2]
+    parameters["n_chains"] = [[30]]
     parameters["chain_lengths"] = [[10]]
     parameters["molecule_kwargs"] = [{}]
     parameters["forcefield"] = ["OPLS_AA_PPS"]
@@ -32,18 +32,18 @@ def get_parameters():
 
     # Sim parameters
     parameters["r_cut"] = [2.5]
-    parameters["dt"] = [0.0003]
+    parameters["dt"] = [0.0001]
     parameters["e_factor"] = [1.0]
 
     # run parameters
-    parameters["shrink_steps"] = [5e6]
+    parameters["shrink_steps"] = [2e6]
     parameters["shrink_kT"] = [4.0]
     parameters["shrink_period"] = [100]
-    parameters["n_steps"] = [5e6]
+    parameters["n_steps"] = [1e6]
     parameters["kT"] = [
-            2.0, 2.1
+             2.0, 2.3, 2.6, 2.9, 3.2
     ]
-    parameters["tau_kt"] = [0.03]
+    parameters["tau_kt"] = [0.01]
 
     # logging parameters
     parameters["num_gsd_frames"] = [500]
@@ -54,7 +54,7 @@ def get_parameters():
 
 
 def main(root):
-    project = signac.init_project("MCMC-project", root=root)  # Set the signac project name
+    project = signac.init_project("poly-flow", root=root)
     param_names, param_combinations = get_parameters()
     # Create jobs
     for params in param_combinations:
