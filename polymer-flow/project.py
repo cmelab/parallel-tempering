@@ -90,7 +90,7 @@ def is_sim(job):
 
 # Useful functions
 def copy_trajectory(job, fname):
-    shutil.copyfile(job.fn("trajectory.gsd"), job.fn("fname"))
+    shutil.copyfile(job.fn("trajectory.gsd"), job.fn(f"{fname}"))
 
 
 def load_pickle_ff(job, ff_file):
@@ -163,7 +163,7 @@ def sample(job):
                 log_write_freq=job.doc.log_write_frequency,
         )
         if not job.fn("forcefield.pickle"): # Pickle FF for future runs
-            sim.pickle_forcefield()
+            sim.pickle_forcefield(file_path=job.fn("forcefield.pickle"))
         if job.sp.e_factor != 1:
             print("Scaling LJ epsilon values...")
             sim.adjust_epsilon(scale_by=job.sp.e_factor)
