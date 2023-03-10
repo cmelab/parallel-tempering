@@ -162,7 +162,7 @@ def sample(job):
                 gsd_write_freq=job.doc.gsd_write_frequency,
                 log_write_freq=job.doc.log_write_frequency,
         )
-        if not job.fn("forcefield.pickle"): # Pickle FF for future runs
+        if not job.isfile("forcefield.pickle"): # Pickle FF for future runs
             sim.pickle_forcefield(file_path=job.fn("forcefield.pickle"))
         if job.sp.e_factor != 1:
             print("Scaling LJ epsilon values...")
