@@ -6,6 +6,7 @@ status, execute operations and submit them to a cluster. See also:
 import os
 import shutil
 import sys
+import pickle
 import numpy as np
 # getting the name of the directory
 # where the this file is present.
