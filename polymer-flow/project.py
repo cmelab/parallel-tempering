@@ -21,6 +21,7 @@ sys.path.append(parent)
 
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
+import gsd.hoomd
 import hoomd_polymers
 import hoomd_polymers.molecules
 import hoomd_polymers.systems
@@ -186,7 +187,6 @@ def sample(job):
                     sim.box_lengths_reduced, job.doc.target_box_reduced
             )
             job.doc.ran_shrink = True
-            sim.pickle_state(file_path="shrink_finished.pickle")
             print("----------------------")
             print("Shrink simulation finished...")
             print("----------------------")
@@ -207,7 +207,6 @@ def sample(job):
         job.doc["timestep"].append(sim.timestep)
 
         job.doc["current_run"] += 1
-        sim.reset_system() # What exactly is this func doing, how to implement with polymer sims
         job.doc["done"] = True
 
 
