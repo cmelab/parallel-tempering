@@ -95,10 +95,7 @@ def copy_trajectory(job, fname):
 
 
 def load_pickle_ff(job, ff_file):
-    """
-    Load hoomd snapshot and list of hoomd forces
-    from pickle files in a job's workspace.
-    """
+    """Load list of hoomd forces from pickle files in a job's workspace."""
     with open(job.fn(ff_file), "rb") as f:
         hoomd_ff = pickle.load(f)
     return hoomd_ff
