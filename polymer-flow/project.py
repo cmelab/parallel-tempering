@@ -122,7 +122,7 @@ def sample(job):
         if job.isfile("restart.gsd"): # Initializing from a restart.gsd
             with gsd.hoomd.open(job.fn("restart.gsd")) as traj:
                 init_snap = traj[0]
-            hoomd_ff = load_pickle_ff(job, "forcefield.picke")
+            hoomd_ff = load_pickle_ff(job, "forcefield.pickle")
         else: # No restart, generate the system and apply a FF
             molecule_obj = getattr(hoomd_polymers.molecules, job.sp.molecule)
             ff_obj = getattr(hoomd_polymers.forcefields, job.sp.forcefield)
