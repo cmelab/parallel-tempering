@@ -90,10 +90,6 @@ def is_sim(job):
 
 
 # Useful functions
-def copy_trajectory(job, fname):
-    shutil.copyfile(job.fn("trajectory.gsd"), job.fn(f"{fname}"))
-
-
 def load_pickle_ff(job, ff_file):
     """Load list of hoomd forces from pickle files in a job's workspace."""
     with open(job.fn(ff_file), "rb") as f:
@@ -199,11 +195,25 @@ def sample(job):
         print("----------------------")
 
         if job.doc["swap"]:
-            copy_trajectory(job, fname=f"trajectory_{job.doc.current_run}_swap.gsd")
+            shutil.copyfile(
+                    job.fn("trajectory.gsd"),
+                    job.fn(f"trajectory_{job.doc.current_run}_swap.gsd")
+            )
+            shutil.copyfile(
+                    job.fn("sim_data.txt"),
+                    job.fn(f"sim_data_{job.doc.current_run}_swap.txt")
+            )
         else:
-            copy_trajectory(job, fname=f"trajectory_{job.doc.current_run}.gsd")
-        job.doc["timestep"].append(sim.timestep)
+            shutil.copyfile(
+                    job.fn("trajectory.gsd"),
+                    job.fn(f"trajectory_{job.doc.current_run}.gsd")
+            )
+            shutil.copyfile(
+                    job.fn("sim_data.txt"),
+                    job.fn(f"sim_data_{job.doc.current_run}.txt")
+            )
 
+        job.doc["timestep"].append(sim.timestep)
         job.doc["current_run"] += 1
         job.doc["done"] = True
 
