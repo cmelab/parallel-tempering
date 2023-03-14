@@ -124,7 +124,6 @@ def sample(job):
             system = system_obj(
                     molecule=molecule_obj,
                     n_mols=job.sp.n_chains,
-                    chain_lengths=job.sp.chain_lengths,
                     density=job.sp.density,
                     mol_kwargs=job.sp.molecule_kwargs,
                     packing_expand_factor=3,
@@ -137,7 +136,7 @@ def sample(job):
             system.apply_forcefield(
                     forcefield=ff_obj(),
                     remove_hydrogens=job.sp.remove_hydrogens,
-                    make_charge_neutral=True
+                    remove_charges=True
             )
             init_snap = system.hoomd_snapshot
             hoomd_ff = system.hoomd_forcefield
@@ -168,7 +167,7 @@ def sample(job):
         # Run shrink simulation
         if not job.doc.ran_shrink:
             job.doc.target_box_reduced = (
-                    system.target_box*10/system.reference_values.distance
+                    system.target_box*10/system.reference.distance
             )
             sim.run_update_volume(
                     final_box_lengths=job.doc.target_box_reduced,

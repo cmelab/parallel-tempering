@@ -22,32 +22,46 @@ def get_parameters():
     # system parameters
     parameters["molecule"] = ["PPS"]
     parameters["system"] = ["Pack"]
-    parameters["density"] = [1.2]
+    parameters["density"] = [1.28]
     parameters["n_chains"] = [[30]]
-    parameters["chain_lengths"] = [[10]]
-    parameters["molecule_kwargs"] = [{}]
+    parameters["molecule_kwargs"] = [
+            {"length": 15}
+    ]
     parameters["forcefield"] = ["OPLS_AA_PPS"]
     parameters["remove_hydrogens"] = [True]
     parameters["seed"] = [20]
 
     # Sim parameters
     parameters["r_cut"] = [2.5]
-    parameters["dt"] = [0.0001]
+    parameters["dt"] = [0.0003]
     parameters["e_factor"] = [1.0]
 
     # run parameters
-    parameters["shrink_steps"] = [2e6]
+    parameters["shrink_steps"] = [1e6]
     parameters["shrink_kT"] = [4.0]
     parameters["shrink_period"] = [100]
     parameters["n_steps"] = [1e6]
     parameters["kT"] = [
-             2.0, 2.3, 2.6, 2.9, 3.2
+            2.0,
+            2.2,
+            2.4,
+            2.6,
+            2.8,
+            3.0,
+            3.2,
+            3.4,
+            3.6,
+            3.8,
+            4.0,
+            4.2,
+            4.4,
+            4.6,
     ]
     parameters["tau_kt"] = [0.01]
 
     # logging parameters
-    parameters["num_gsd_frames"] = [500]
-    parameters["num_data_logs"] = [5000]
+    parameters["num_gsd_frames"] = [400]
+    parameters["num_data_logs"] = [50000]
 
     return list(parameters.keys()), list(product(*parameters.values()))
 
