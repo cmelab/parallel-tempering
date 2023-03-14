@@ -24,9 +24,7 @@ def get_parameters():
     parameters["system"] = ["Pack"]
     parameters["density"] = [1.28]
     parameters["n_chains"] = [[30]]
-    parameters["molecule_kwargs"] = [
-            {"length": 15}
-    ]
+    parameters["polymer_lengths"] = [15]
     parameters["forcefield"] = ["OPLS_AA_PPS"]
     parameters["remove_hydrogens"] = [True]
     parameters["seed"] = [20]
