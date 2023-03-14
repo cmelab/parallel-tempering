@@ -121,11 +121,12 @@ def sample(job):
             molecule_obj = getattr(hoomd_polymers.molecules, job.sp.molecule)
             ff_obj = getattr(hoomd_polymers.forcefields, job.sp.forcefield)
             system_obj = getattr(hoomd_polymers.systems, job.sp.system)
+            mol_kwargs = {"length": job.sp.polymer_lengths}
             system = system_obj(
                     molecule=molecule_obj,
                     n_mols=job.sp.n_chains,
                     density=job.sp.density,
-                    mol_kwargs=job.sp.molecule_kwargs,
+                    mol_kwargs=mol_kwargs,
                     packing_expand_factor=3,
             )
             print("----------------------")
@@ -167,7 +168,7 @@ def sample(job):
         # Run shrink simulation
         if not job.doc.ran_shrink:
             job.doc.target_box_reduced = (
-                    system.target_box*10/system.reference.distance
+                    system.target_box*10/system.reference_distance
             )
             sim.run_update_volume(
                     final_box_lengths=job.doc.target_box_reduced,
