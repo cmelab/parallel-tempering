@@ -78,6 +78,9 @@ class Fry(DefaultSlurmEnvironment):
 def sampled(job):
     return job.doc.get("done")
 
+@MyProject.label
+def averaged(job):
+    return job.doc.get("averaged")
 
 @MyProject.label
 def initialized(job):
@@ -87,6 +90,10 @@ def initialized(job):
 @MyProject.label
 def is_sim(job):
     return job.doc["job_type"] == "sim"
+
+@MyProject.label
+def pt_done(job):
+    return job.doc.get("pt_done")
 
 
 # Useful functions
@@ -217,6 +224,39 @@ def sample(job):
         job.doc["current_run"] += 1
         job.doc["done"] = True
 
+
+@directives(executable="python -u")
+@directives(ngpu=0)
+@MyProject.operation
+@MyProject.post(averaged)
+@MyProject.pre(pt_done)
+def variables(job):
+    import numpy as np
+    from cmeutils.structure import radius_of_gyration
+
+    # Rg
+    window_rgs = []
+    window_rg_stds = []
+    window_rg_arrays = []
+    for i in range(1, 102):
+        gsd_file = job.fn(f"trajectory_{i}.gsd")
+        rg_mean, rg_std, rg_array = radius_of_gyration(
+                gsd_file=str(gsd_file), start=0, stop=-1
+        )
+        window_rgs.append(rg_mean)
+        window_rg_stds.append(rg_std)
+        window_rg_arrays.append(rg_array)
+    np.save(file=job.fn("rg_mean.npy"), arr=np.asarray(window_rgs))
+    np.save(file=job.fn("rg_std.npy"), arr=np.asarray(window_rg_stds))
+    np.save(file=job.fn("rg_array.npy"), arr=np.asarray(window_rg_arrays))
+
+    # Re
+
+    # S2
+
+    # PE
+
+    job.doc.averaged = False
 
 if __name__ == "__main__":
     MyProject().main()

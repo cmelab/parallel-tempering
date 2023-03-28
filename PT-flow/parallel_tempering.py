@@ -151,6 +151,19 @@ def submit_sims(project):
         raise RuntimeError(f"project submission failed. Error at line: {error.args[0]}")
 
 
+def submit_post(project):
+    for job in get_sim_jobs():
+        job.doc["pt_done"] = True
+        job.doc["averaged"] = False
+    try:
+        project.submit()
+        print("----------------------")
+        print("Successfully submitted simulations...")
+        print("----------------------")
+    except Exception as error:
+        raise RuntimeError(f"project submission failed. Error at line: {error.args[0]}")
+
+
 @directives(executable="python -u")
 @directives(ngpu=0)
 @PT_Project.operation
@@ -255,6 +268,27 @@ def sample(job):
                 submit_sims(MyProject())
 
         job.doc["done"] = True
+
+
+@directives(executable="python -u")
+@directives(ngpu=0)
+@PT_Project.operation
+@PT_Project.pre(finished)
+def averaging(job):
+    with job:
+        print("-----------------------")
+        print("JOB ID NUMBER:")
+        print(job.id)
+        print("-----------------------")
+        # import files from signac flow
+        project = signac.get_project()
+        #path = os.path.join(project.root_directory(), "../{}/".format(job.sp.mode))
+        path = "/home/erjank_project/chrisjones/pt-polymers/parallel-tempering/polymer-flow"
+        sys.path.append(path)
+        #from init import init_jobs
+        from project import MyProject
+
+        submit_post(MyProject())
 
 
 if __name__ == "__main__":

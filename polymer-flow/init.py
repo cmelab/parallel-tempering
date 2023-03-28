@@ -35,10 +35,10 @@ def get_parameters():
     parameters["e_factor"] = [1.0]
 
     # run parameters
-    parameters["shrink_steps"] = [1e6]
+    parameters["shrink_steps"] = [5e6]
     parameters["shrink_kT"] = [4.0]
-    parameters["shrink_period"] = [100]
-    parameters["n_steps"] = [1e6]
+    parameters["shrink_period"] = [1000]
+    parameters["n_steps"] = [1e7]
     parameters["kT"] = [
             2.0,
             2.2,
