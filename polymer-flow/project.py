@@ -232,12 +232,23 @@ def sample(job):
 @MyProject.pre(pt_done)
 def variables(job):
     import numpy as np
-    from cmeutils.structure import radius_of_gyration
+    from cmeutils.structure import (
+            radius_of_gyration, end_to_end, nematic_order_param
+    )
 
     # Rg
-    window_rgs = []
-    window_rg_stds = []
-    window_rg_arrays = []
+    window_rgs = [] # means
+    window_rg_stds = [] # stds
+    window_rg_arrays = [] # list of vals
+    # Re
+    window_res = []
+    window_re_stds = []
+    window_re_arrays = []
+    # S2 Order Param
+    window_order_param = []
+
+    potential_energy = []
+
     for i in range(1, 102):
         gsd_file = job.fn(f"trajectory_{i}.gsd")
         rg_mean, rg_std, rg_array = radius_of_gyration(
@@ -246,15 +257,30 @@ def variables(job):
         window_rgs.append(rg_mean)
         window_rg_stds.append(rg_std)
         window_rg_arrays.append(rg_array)
+
+        re_array, re_mean, re_stds, re_vectors = end_to_end(gsd_file, 4, 102, 0, -1)
+        window_res.append(re_mean)
+        window_re_stds.append(re_std)
+        window_re_arrays.append(re_array)
+
+        for vec in re_vectors:
+            op = nematic_order_param(vec, director=(1, 1, 1))
+            window_order_param.append(op.order)
+
+        log_file = job.fn(f"sim_data_{i}.txt")
+        pe = np.genfromtxt(log_file, names=True)[
+                "md.compute.ThermodynamicQuantities.potential_energy"
+        ]
+        potential_energy.extend(pe.tolist())
+
     np.save(file=job.fn("rg_mean.npy"), arr=np.asarray(window_rgs))
     np.save(file=job.fn("rg_std.npy"), arr=np.asarray(window_rg_stds))
     np.save(file=job.fn("rg_array.npy"), arr=np.asarray(window_rg_arrays))
-
-    # Re
-
-    # S2
-
-    # PE
+    np.save(file=job.fn("re_mean.npy"), arr=np.asarray(window_res))
+    np.save(file=job.fn("re_std.npy"), arr=np.asarray(window_re_stds))
+    np.save(file=job.fn("re_array.npy"), arr=np.asarray(window_re_arrays))
+    np.save(file=job.fn("s2_order.npy"), arr=np.asarray(window_order_param))
+    np.save(file=job.fn("potential_energy.npy"), arr=np.asarray(potential_energy))
 
     job.doc.averaged = False
 
