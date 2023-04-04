@@ -252,16 +252,20 @@ def sample(job):
 
                 snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
                 positions_i = copy.deepcopy(snapshot_i.particles.position)
+                image_i = copy.deepcopy(snapshot_i.particles.image)
 
                 snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
                 positions_j = copy.deepcopy(snapshot_j.particles.position)
+                image_j = copy.deepcopy(snapshot_j.particles.image)
 
                 # swap positions and save snapshot TODO: do we need to swap anything else for MD?
                 with gsd.hoomd.open(job_i.fn("restart.gsd"), "wb") as traj:
                     snapshot_i.particles.position = positions_j
+                    snapshot_i.particles.image = image_j
                     traj.append(snapshot_i)
                 with gsd.hoomd.open(job_j.fn("restart.gsd"), "wb") as traj:
                     snapshot_j.particles.position = positions_i
+                    snapshot_j.particles.image = image_i
                     traj.append(snapshot_j)
 
                 # submit simulations
