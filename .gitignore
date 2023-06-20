@@ -1,3 +1,10 @@
+# Signac stuff
+*.out
+signac.rc
+signac_statepoints.json
+*workspace/
+signac_project_document.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -76,6 +83,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
 
 # IPython
 profile_default/

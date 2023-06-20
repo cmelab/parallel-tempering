@@ -151,7 +151,21 @@ def submit_sims(project):
         raise RuntimeError(f"project submission failed. Error at line: {error.args[0]}")
 
 
+def submit_post(project):
+    for job in get_sim_jobs():
+        job.doc["pt_done"] = True
+        job.doc["averaged"] = False
+    try:
+        project.submit()
+        print("----------------------")
+        print("Successfully submitted simulations...")
+        print("----------------------")
+    except Exception as error:
+        raise RuntimeError(f"project submission failed. Error at line: {error.args[0]}")
+
+
 @directives(executable="python -u")
+@directives(ngpu=0)
 @PT_Project.operation
 @PT_Project.post(finished)
 def sample(job):
@@ -192,10 +206,10 @@ def sample(job):
 
         # load simulation jobs and e_factors
         project = signac.get_project()
-        e_factors = []
+        swap_parameters = []
         sim_jobs = []
-        for e, s_job in project.find_jobs({"doc.job_type": "sim"}).groupby("e_factor"):
-            e_factors.append(e)
+        for v, s_job in project.find_jobs({"doc.job_type": "sim"}).groupby(job.sp.group_by):
+            swap_parameters.append(v)
             sim_jobs.append(list(s_job)[0])
         print('sim_jobs: ', sim_jobs)
         while job.doc["current_attempt"] <= job.sp.n_attempts:
@@ -222,38 +236,63 @@ def sample(job):
                 i = random.randint(1, len(sim_jobs) - 1)
                 # find the neighbor with lower e_factor (equivalent to higher T)
                 j = i - 1
-                e_factor_i = e_factors[i]
+                param_i = swap_parameters[i]
                 job_i = sim_jobs[i]
 
-                e_factor_j = e_factors[j]
+                param_j = swap_parameters[j]
                 job_j = sim_jobs[j]
                 # TODO: get potential energy for both and calculate acceptance criteria.
                 print("----------------------")
-                print("Swapping e_factor {} with {}...".format(e_factor_i, e_factor_j))
+                print(f"Swapping {job.doc.swap_parameter} {param_i} with {param_j}...")
                 print("----------------------")
                 # Accepting the swap
-                job.doc["swap_history"].append({"i": i, "j": j, "e_factor_i": e_factor_i, "e_factor_j": e_factor_j,
+                job.doc["swap_history"].append({"i": i, "j": j, "param_i": param_i, "param_j": param_j,
                                                 "job_i": job_i.id, "job_j": job_j.id, "done": False})
                 job.doc["current_attempt"] += 1
 
                 snapshot_i = gsd.hoomd.open(job_i.fn("restart.gsd"))[0]
                 positions_i = copy.deepcopy(snapshot_i.particles.position)
+                image_i = copy.deepcopy(snapshot_i.particles.image)
 
                 snapshot_j = gsd.hoomd.open(job_j.fn("restart.gsd"))[0]
                 positions_j = copy.deepcopy(snapshot_j.particles.position)
+                image_j = copy.deepcopy(snapshot_j.particles.image)
 
-                # swap positions and save snapshot
+                # swap positions and save snapshot TODO: do we need to swap anything else for MD?
                 with gsd.hoomd.open(job_i.fn("restart.gsd"), "wb") as traj:
                     snapshot_i.particles.position = positions_j
+                    snapshot_i.particles.image = image_j
                     traj.append(snapshot_i)
                 with gsd.hoomd.open(job_j.fn("restart.gsd"), "wb") as traj:
                     snapshot_j.particles.position = positions_i
+                    snapshot_j.particles.image = image_i
                     traj.append(snapshot_j)
 
                 # submit simulations
                 submit_sims(MyProject())
 
         job.doc["done"] = True
+
+
+@directives(executable="python -u")
+@directives(ngpu=0)
+@PT_Project.operation
+@PT_Project.pre(finished)
+def averaging(job):
+    with job:
+        print("-----------------------")
+        print("JOB ID NUMBER:")
+        print(job.id)
+        print("-----------------------")
+        # import files from signac flow
+        project = signac.get_project()
+        #path = os.path.join(project.root_directory(), "../{}/".format(job.sp.mode))
+        path = "/home/erjank_project/chrisjones/pt-polymers/parallel-tempering/polymer-flow"
+        sys.path.append(path)
+        #from init import init_jobs
+        from project import MyProject
+
+        submit_post(MyProject())
 
 
 if __name__ == "__main__":

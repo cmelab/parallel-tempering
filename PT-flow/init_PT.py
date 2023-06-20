@@ -20,19 +20,28 @@ def get_parameters():
     parameters = OrderedDict()
 
     # simulation mode: MCMC-flow or polymer-flow
-    parameters["mode"] = ["MCMC-flow"]
+    parameters["mode"] = [
+            #"MCMC-flow",
+            "polymer-flow"
+    ]
+    # Pick the relevant parameter to sort jobs by when swapping
+    # This parameter must be defined in the simulation project's state points
+    parameters["group_by"] = [
+            #"e_factor",
+            "kT",
+    ]
     parameters["seed"] = [20]
 
     # total number of swaps`
-    parameters["n_attempts"] = [200]
+    parameters["n_attempts"] = [20]
     # initial wait time (including mixing run)
-    parameters["first_wait"] = [900]
+    parameters["first_wait"] = [1500]
     # initial wait time (in seconds) before checking the status of jobs
-    parameters["init_wait"] = [400]
+    parameters["init_wait"] = [1000]
     # additional wait time (in seconds) after the first wait time is over and jobs are still not done
-    parameters["extra_wait"] = [100]
+    parameters["extra_wait"] = [500]
     # maximum wait time (in seconds)
-    parameters["max_tries"] = [20]
+    parameters["max_tries"] = [200]
 
     return list(parameters.keys()), list(product(*parameters.values()))
 
@@ -50,6 +59,7 @@ def main():
         parent_job.doc.setdefault("current_attempt", 0)
         parent_job.doc.setdefault("swap_history", [])
         parent_job.doc.setdefault("accepted_attempts", [])
+        parent_job.doc.swap_parameter = parent_job.sp.group_by
 
     project.write_statepoints()
 
